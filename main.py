@@ -3,6 +3,9 @@ import os
 import sys
 import datetime
 
+import lib.time_util as time_util
+
+
 # Argument Parser
 parser = argparse.ArgumentParser()
 parser.add_argument('source')
@@ -19,4 +22,10 @@ if(not os.path.exists(arguments.source)):
 # Destination Dir
 if(not os.path.exists(arguments.destination)):
     print('Can\'t find destination directory "%s"' % arguments.destination)
+    sys.exit()
+# Time
+time = time_util.parseTimeArgument(arguments.time)
+if(time == None):
+    print('Can\'t parse "%s" as a time argument' % arguments.time)
+    print('Must be one of "today" or "yesterday" or of the format "YYYY-MM-DD"')
     sys.exit()
