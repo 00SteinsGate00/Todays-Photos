@@ -29,3 +29,28 @@ if(time == None):
     print('Can\'t parse "%s" as a time argument' % arguments.time)
     print('Must be one of "today" or "yesterday" or of the format "YYYY-MM-DD"')
     sys.exit()
+
+
+# processing
+
+# jpeg images
+images_jpg = [os.path.join(arguments.source, image)
+                for image
+                in os.listdir(arguments.source)
+                if time_util.modTimestamp(os.path.join(arguments.source, image)) == time
+                # some hidden temporary files
+                and image[0] != '.'
+                # jpeg extensions
+                and os.path.splitext(image)[1] in ['.JPG', '.jpg', '.JPEG', '.jpeg']
+             ]
+
+# RAW images
+images_raw = [os.path.join(arguments.source, image)
+                for image
+                in os.listdir(arguments.source)
+                if time_util.modTimestamp(os.path.join(arguments.source, image)) == time
+                # some hidden temporary files
+                and image[0] != '.'
+                # not jpeg => RAW
+                and os.path.splitext(image)[1] not in ['.JPG', '.jpg', '.JPEG', '.jpeg']
+             ]
