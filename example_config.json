@@ -1,0 +1,13 @@
+{
+	"target_folders": [
+		"01 Deselect",
+		"02 Select",
+		"03 Luminar",
+		"04 Export"
+	],
+	"export_folder": "01 Deselect",
+	"source_dir": "/Volumes/EOS_DIGITAL/DCIM/100CANON",
+	"destination_dir": "/Users/wuschel/Desktop",
+	"date_format": "%Y.%m.%d",
+	"export_folder_delimiter": " | "
+}

@@ -9,7 +9,7 @@ import lib.time_util as time_util
 import lib.config as config
 
 # config file
-config_file = os.path.join(os.path.dirname(__file__), 'config.json')
+config_file = os.path.join(os.path.expanduser('~'), '.todaysphotos_config.json')
 
 # Argument Parser
 description = """
