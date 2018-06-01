@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import shutil
 import sys
 import datetime
 
@@ -80,6 +81,20 @@ if(len(images_jpg) > 0 or len(images_raw) > 0):
     if(len(images_jpg) > 0):
         os.makedirs(os.path.join(arguments.destination, cfg.export_folder, 'JPG'))
         os.makedirs(os.path.join(arguments.destination, cfg.export_folder, 'RAW'))
+
+    # copy the images
+    # RAW
+    # If there are  JPGs copy them directly into the RAW subfolder
+    if(len(images_jpg) > 0):
+        for raw_image in images_raw:
+            shutil.copy2(raw_image, os.path.join(arguments.destination, cfg.export_folder, 'RAW'))
+    # Else copy them directly into the export folder
+    else:
+        for raw_image in images_raw:
+            shutil.copy2(raw_image, os.path.join(arguments.destination, cfg.export_folder))
+    # JPG
+    for jpg_image in images_jpg:
+        shutil.copy2(jpg_image, os.path.join(arguments.destination, cfg.export_folder, 'JPG'))
 # no images found
 else:
     print('No images from %s' % (datetime.date.isoformat(time)))
