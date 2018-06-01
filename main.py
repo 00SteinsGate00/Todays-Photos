@@ -14,18 +14,25 @@ config_file = os.path.join(os.path.dirname(__file__), 'config.json')
 # Argument Parser
 parser = argparse.ArgumentParser()
 parser.add_argument('destination')
-parser.add_argument('-t', '--time')
+parser.add_argument('date')
+parser.add_argument('-t', '--type')
 arguments = parser.parse_args()
 
-# Argument Verification
+
+
+# ##################### #
+# Argument Verification #
+# ##################### #
 
 # Time
-date = time_util.parseTimeArgument(arguments.time)
+date = time_util.parseTimeArgument(arguments.date)
 if(date == None):
-    print('Can\'t parse "%s" as a time argument' % arguments.time)
+    print('Can\'t parse "%s" as a time argument' % arguments.date)
     print('Must be one of "today" or "yesterday" or of the format "YYYY-MM-DD"')
     sys.exit()
 
+# Type
+type = arguments.type if arguments.type else ""
 
 # config reading and error parsing
 try:
@@ -44,7 +51,10 @@ except KeyError as e:
     sys.exit()
 
 
-# processing
+
+# ########## #
+# Processing #
+# ########## #
 
 # jpeg images
 images_jpg = [os.path.join(cfg.source_dir, image)
@@ -72,7 +82,7 @@ images_raw = [os.path.join(cfg.source_dir, image)
 # export images
 if(len(images_jpg) > 0 or len(images_raw) > 0):
     # create the target directory
-    output_dir = cfg.delimiter.join([date.strftime(cfg.date_format), arguments.destination])
+    output_dir = cfg.delimiter.join(filter(None, [date.strftime(cfg.date_format), type, arguments.destination]))
     os.makedirs(output_dir, exist_ok=True)
     # create all the output subfolders
     for target_folder in cfg.target_folders:
