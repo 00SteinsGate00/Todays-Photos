@@ -90,6 +90,15 @@ Modify the configuration file to your needs
  	|- target_folder n   	  
 ```
 
+## Install
+
+Download the latest release from the [release page](https://github.com/00SteinsGate00/Todays-Photos/releases) and copy it to somewhere in your path, for example `usr/local/bin`
+
+Modify the [example_config.json](example_config.json) to your needs and store it at `$HOME/.todaysphotos_config.json`.
+
+You're good to go!
+
+
 ## Example
 
 Backup your portrait session from today
