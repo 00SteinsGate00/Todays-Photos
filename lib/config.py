@@ -15,3 +15,4 @@ class Config:
         self.export_folder  = cfg_json['export_folder']
         self.target_folders = cfg_json['target_folders']
         self.date_format    = cfg_json['date_format']
+        self.delimiter = cfg_json['export_folder_delimiter'] if 'export_folder_delimiter' in cfg_json.keys() else ' '

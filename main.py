@@ -20,8 +20,8 @@ arguments = parser.parse_args()
 # Argument Verification
 
 # Time
-time = time_util.parseTimeArgument(arguments.time)
-if(time == None):
+date = time_util.parseTimeArgument(arguments.time)
+if(date == None):
     print('Can\'t parse "%s" as a time argument' % arguments.time)
     print('Must be one of "today" or "yesterday" or of the format "YYYY-MM-DD"')
     sys.exit()
@@ -50,7 +50,7 @@ except KeyError as e:
 images_jpg = [os.path.join(cfg.source_dir, image)
                 for image
                 in os.listdir(cfg.source_dir)
-                if time_util.modTimestamp(os.path.join(cfg.source_dir, image)) == time
+                if time_util.modTimestamp(os.path.join(cfg.source_dir, image)) == date
                 # some hidden temporary files
                 and image[0] != '.'
                 # jpeg extensions
@@ -61,40 +61,42 @@ images_jpg = [os.path.join(cfg.source_dir, image)
 images_raw = [os.path.join(cfg.source_dir, image)
                 for image
                 in os.listdir(cfg.source_dir)
-                if time_util.modTimestamp(os.path.join(cfg.source_dir, image)) == time
+                if time_util.modTimestamp(os.path.join(cfg.source_dir, image)) == date
                 # some hidden temporary files
                 and image[0] != '.'
                 # not jpeg => RAW
                 and os.path.splitext(image)[1] not in ['.JPG', '.jpg', '.JPEG', '.jpeg']
              ]
 
+
 # export images
 if(len(images_jpg) > 0 or len(images_raw) > 0):
     # create the target directory
-    os.makedirs(arguments.destination, exist_ok=True)
+    output_dir = cfg.delimiter.join([date.strftime(cfg.date_format), arguments.destination])
+    os.makedirs(output_dir, exist_ok=True)
     # create all the output subfolders
     for target_folder in cfg.target_folders:
-        os.makedirs(os.path.join(arguments.destination, target_folder), exist_ok=True)
+        os.makedirs(os.path.join(output_dir, target_folder), exist_ok=True)
     # create the export folder in case it was none of target folders
-    os.makedirs(os.path.join(arguments.destination, cfg.export_folder), exist_ok=True)
+    os.makedirs(os.path.join(output_dir, cfg.export_folder), exist_ok=True)
     # check if there are JPGs and create the folders accordingly
     if(len(images_jpg) > 0):
-        os.makedirs(os.path.join(arguments.destination, cfg.export_folder, 'JPG'))
-        os.makedirs(os.path.join(arguments.destination, cfg.export_folder, 'RAW'))
+        os.makedirs(os.path.join(output_dir, cfg.export_folder, 'JPG'))
+        os.makedirs(os.path.join(output_dir, cfg.export_folder, 'RAW'))
 
     # copy the images
     # RAW
     # If there are  JPGs copy them directly into the RAW subfolder
     if(len(images_jpg) > 0):
         for raw_image in images_raw:
-            shutil.copy2(raw_image, os.path.join(arguments.destination, cfg.export_folder, 'RAW'))
+            shutil.copy2(raw_image, os.path.join(output_dir, cfg.export_folder, 'RAW'))
     # Else copy them directly into the export folder
     else:
         for raw_image in images_raw:
-            shutil.copy2(raw_image, os.path.join(arguments.destination, cfg.export_folder))
+            shutil.copy2(raw_image, os.path.join(output_dir, cfg.export_folder))
     # JPG
     for jpg_image in images_jpg:
-        shutil.copy2(jpg_image, os.path.join(arguments.destination, cfg.export_folder, 'JPG'))
+        shutil.copy2(jpg_image, os.path.join(output_dir, cfg.export_folder, 'JPG'))
 # no images found
 else:
-    print('No images from %s' % (datetime.date.isoformat(time)))
+    print('No images from %s' % (date.strftime(cfg.date_format)))
