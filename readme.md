@@ -2,6 +2,8 @@
 
 Easy to use python script that gets today's (or from any other day) photos from your camera and puts them into your photo folder.
 
+![demogif](http://files.janholub.de/todaysphotos.gif)
+
 Once you've setup your **config.json** file it can be as easy as
 
 ```
