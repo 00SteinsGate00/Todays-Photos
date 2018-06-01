@@ -1,24 +1,23 @@
 import argparse
+import json
 import os
 import sys
 import datetime
 
 import lib.time_util as time_util
+import lib.config as config
 
+# config file
+config_file = os.path.join(os.path.dirname(__file__), 'config.json')
 
 # Argument Parser
 parser = argparse.ArgumentParser()
-parser.add_argument('source')
 parser.add_argument('destination')
 parser.add_argument('-t', '--time')
 arguments = parser.parse_args()
 
 # Argument Verification
 
-# Source Dir
-if(not os.path.exists(arguments.source)):
-    print('Can\'t find source directory "%s"' % arguments.source)
-    sys.exit()
 # Destination Dir
 if(not os.path.exists(arguments.destination)):
     print('Can\'t find destination directory "%s"' % arguments.destination)
@@ -31,13 +30,30 @@ if(time == None):
     sys.exit()
 
 
+# config reading and error parsing
+try:
+    cfg = config.Config(config_file)
+# invalid JSON
+except json.JSONDecodeError as e:
+    print('Cannot parse configuration file. Invalid JSON')
+    sys.exit()
+# file does not exist
+except FileNotFoundError as e:
+    print('Configuration file "%s" not found' % (config_file))
+    sys.exit()
+# missing config option
+except KeyError as e:
+    print('%s missing in configuration file "%s"' % (e, config_file))
+    sys.exit()
+
+
 # processing
 
 # jpeg images
-images_jpg = [os.path.join(arguments.source, image)
+images_jpg = [os.path.join(cfg.source_dir, image)
                 for image
-                in os.listdir(arguments.source)
-                if time_util.modTimestamp(os.path.join(arguments.source, image)) == time
+                in os.listdir(cfg.source_dir)
+                if time_util.modTimestamp(os.path.join(cfg.source_dir, image)) == time
                 # some hidden temporary files
                 and image[0] != '.'
                 # jpeg extensions
@@ -45,10 +61,10 @@ images_jpg = [os.path.join(arguments.source, image)
              ]
 
 # RAW images
-images_raw = [os.path.join(arguments.source, image)
+images_raw = [os.path.join(cfg.source_dir, image)
                 for image
-                in os.listdir(arguments.source)
-                if time_util.modTimestamp(os.path.join(arguments.source, image)) == time
+                in os.listdir(cfg.source_dir)
+                if time_util.modTimestamp(os.path.join(cfg.source_dir, image)) == time
                 # some hidden temporary files
                 and image[0] != '.'
                 # not jpeg => RAW
