@@ -16,6 +16,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('destination')
 parser.add_argument('date')
 parser.add_argument('-t', '--type')
+parser.add_argument('-d', '--delete-originals', action='store_true')
 arguments = parser.parse_args()
 
 
@@ -33,6 +34,12 @@ if(date == None):
 
 # Type
 type = arguments.type if arguments.type else ""
+
+
+
+# ################## #
+# Configuration File #
+# ################## #
 
 # config reading and error parsing
 try:
@@ -94,19 +101,23 @@ if(len(images_jpg) > 0 or len(images_raw) > 0):
         os.makedirs(os.path.join(output_dir, cfg.export_folder, 'JPG'))
         os.makedirs(os.path.join(output_dir, cfg.export_folder, 'RAW'))
 
-    # copy the images
+    # copy/move the images
+    # store the correct function to move or copy the files
+    process_func = shutil.move if arguments.delete_originals else shutil.copy2
     # RAW
-    # If there are  JPGs copy them directly into the RAW subfolder
+    # If there are  JPGs copy/move them directly into the RAW subfolder
     if(len(images_jpg) > 0):
         for raw_image in images_raw:
-            shutil.copy2(raw_image, os.path.join(output_dir, cfg.export_folder, 'RAW'))
-    # Else copy them directly into the export folder
+            process_func(raw_image, os.path.join(output_dir, cfg.export_folder, 'RAW'))
+    # Else copy/move them directly into the export folder
     else:
         for raw_image in images_raw:
-            shutil.copy2(raw_image, os.path.join(output_dir, cfg.export_folder))
+            process_func(raw_image, os.path.join(output_dir, cfg.export_folder))
+
     # JPG
     for jpg_image in images_jpg:
-        shutil.copy2(jpg_image, os.path.join(output_dir, cfg.export_folder, 'JPG'))
+        process_func(jpg_image, os.path.join(output_dir, cfg.export_folder, 'JPG'))
+
 # no images found
 else:
     print('No images from %s' % (date.strftime(cfg.date_format)))
