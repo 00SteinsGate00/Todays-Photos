@@ -12,11 +12,25 @@ import lib.config as config
 config_file = os.path.join(os.path.dirname(__file__), 'config.json')
 
 # Argument Parser
-parser = argparse.ArgumentParser()
-parser.add_argument('destination')
-parser.add_argument('date')
-parser.add_argument('-t', '--type')
-parser.add_argument('-d', '--delete-originals', action='store_true')
+description = """
+    By specifying a day the script will copy or move all images from your camera to the
+    specified output directory. In the config.json file various options can be set for
+    subfolders, date format and output naming options.
+    The date will be added at the start of the output directory name and you can also include
+    a type.
+    Splits into JPG and RAW folder if JPG images are present.
+"""
+parser = argparse.ArgumentParser(description=description)
+parser.add_argument('destination',
+                    help='The output directory')
+parser.add_argument('date',
+                    help='Day from which the images should be copied. Either "today",\
+                         "yesterday" or a date of the format YYYY-MM-DD')
+parser.add_argument('-t', '--type',
+                    help='Type of photography. Will be added to the export folder name')
+parser.add_argument('-d', '--delete-orig',
+                    help='If set the images will be deleted from the source directory',
+                    action='store_true')
 arguments = parser.parse_args()
 
 
@@ -103,7 +117,7 @@ if(len(images_jpg) > 0 or len(images_raw) > 0):
 
     # copy/move the images
     # store the correct function to move or copy the files
-    process_func = shutil.move if arguments.delete_originals else shutil.copy2
+    process_func = shutil.move if arguments.delete_orig else shutil.copy2
     # RAW
     # If there are  JPGs copy/move them directly into the RAW subfolder
     if(len(images_jpg) > 0):
