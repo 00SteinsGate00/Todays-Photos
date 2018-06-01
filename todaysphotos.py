@@ -21,14 +21,15 @@ description = """
     Splits into JPG and RAW folder if JPG images are present.
 """
 parser = argparse.ArgumentParser(description=description)
-parser.add_argument('date',
+parser.add_argument('-d', '--date',
                     help='Day from which the images should be copied. Either "today",\
-                         "yesterday" or a date of the format YYYY-MM-DD')
+                         "yesterday" or a date of the format YYYY-MM-DD',
+                    default='today')
 parser.add_argument('-n', '--name',
                     help='Name of the photoshoot. Will be added to export folder name')
 parser.add_argument('-t', '--type',
                     help='Type of photography. Will be added to the export folder name')
-parser.add_argument('-d', '--delete-orig',
+parser.add_argument('-r', '--remove-orig',
                     help='If set the images will be deleted from the source directory',
                     action='store_true')
 parser.add_argument('-o','--output',
@@ -130,8 +131,8 @@ if(len(images_jpg) > 0 or len(images_raw) > 0):
 
     # copy/move the images
     # store the correct function to move or copy the files
-    process_func    = shutil.move if arguments.delete_orig else shutil.copy2
-    process_verbose = "Moving" if arguments.delete_orig else "Copying"
+    process_func    = shutil.move if arguments.remove_orig else shutil.copy2
+    process_verbose = "Moving" if arguments.remove_orig else "Copying"
     # RAW
     # If there are  JPGs copy/move them directly into the RAW subfolder
     print("%s RAW images" % process_verbose)
@@ -170,7 +171,7 @@ print('Type: %s' % (type if type else "None"))
 print('Name: %s' % (name if name else "None"))
 print('Source Directory: %s' % cfg.source_dir)
 print('Output Directory: %s' % output_path)
-print('Delete Originals: %s' % ("Yes" if arguments.delete_orig else "No"))
+print('Delete Originals: %s' % ("Yes" if arguments.remove_orig else "No"))
 print("")
 print('RAW images: %d' % len(images_raw))
 print('JPG images: %d' % len(images_jpg))
