@@ -21,33 +21,19 @@ description = """
     Splits into JPG and RAW folder if JPG images are present.
 """
 parser = argparse.ArgumentParser(description=description)
-parser.add_argument('destination',
-                    help='The output directory')
 parser.add_argument('date',
                     help='Day from which the images should be copied. Either "today",\
                          "yesterday" or a date of the format YYYY-MM-DD')
+parser.add_argument('-n', '--name',
+                    help='Name of the photoshoot. Will be added to export folder name')
 parser.add_argument('-t', '--type',
                     help='Type of photography. Will be added to the export folder name')
 parser.add_argument('-d', '--delete-orig',
                     help='If set the images will be deleted from the source directory',
                     action='store_true')
+parser.add_argument('-o','--output',
+                    help='Output directory that will overwrite the one from the configuration file')
 arguments = parser.parse_args()
-
-
-
-# ##################### #
-# Argument Verification #
-# ##################### #
-
-# Time
-date = time_util.parseTimeArgument(arguments.date)
-if(date == None):
-    print('Can\'t parse "%s" as a time argument' % arguments.date)
-    print('Must be one of "today" or "yesterday" or of the format "YYYY-MM-DD"')
-    sys.exit()
-
-# Type
-type = arguments.type if arguments.type else ""
 
 
 
@@ -69,6 +55,31 @@ except FileNotFoundError as e:
 # missing config option
 except KeyError as e:
     print('%s missing in configuration file "%s"' % (e, config_file))
+    sys.exit()
+
+
+
+# ##################### #
+# Argument Verification #
+# ##################### #
+
+# Time
+date = time_util.parseTimeArgument(arguments.date)
+if(date == None):
+    print('Can\'t parse "%s" as a time argument' % arguments.date)
+    print('Must be one of "today" or "yesterday" or of the format "YYYY-MM-DD"')
+    sys.exit()
+
+# Type
+type = arguments.type if arguments.type else ""
+# Name
+name = arguments.name if arguments.name else ""
+
+# output directory
+# command line specified one will overwrite the one from the config file
+output_dir = arguments.output if arguments.output else cfg.destination_dir
+if(not os.path.exists(output_dir)):
+    print('Output directory "%s" does not exist' % output_dir)
     sys.exit()
 
 
@@ -103,17 +114,18 @@ images_raw = [os.path.join(cfg.source_dir, image)
 # export images
 if(len(images_jpg) > 0 or len(images_raw) > 0):
     # create the target directory
-    output_dir = cfg.delimiter.join(filter(None, [date.strftime(cfg.date_format), type, arguments.destination]))
-    os.makedirs(output_dir, exist_ok=True)
+    output_dir_name = cfg.delimiter.join(filter(None, [date.strftime(cfg.date_format), type, arguments.name]))
+    output_path     = os.path.join(output_dir, output_dir_name)
+    os.makedirs(output_path, exist_ok=True)
     # create all the output subfolders
     for target_folder in cfg.target_folders:
-        os.makedirs(os.path.join(output_dir, target_folder), exist_ok=True)
+        os.makedirs(os.path.join(output_path, target_folder), exist_ok=True)
     # create the export folder in case it was none of target folders
-    os.makedirs(os.path.join(output_dir, cfg.export_folder), exist_ok=True)
+    os.makedirs(os.path.join(output_path, cfg.export_folder), exist_ok=True)
     # check if there are JPGs and create the folders accordingly
     if(len(images_jpg) > 0):
-        os.makedirs(os.path.join(output_dir, cfg.export_folder, 'JPG'))
-        os.makedirs(os.path.join(output_dir, cfg.export_folder, 'RAW'))
+        os.makedirs(os.path.join(output_path, cfg.export_folder, 'JPG'))
+        os.makedirs(os.path.join(output_path, cfg.export_folder, 'RAW'))
 
     # copy/move the images
     # store the correct function to move or copy the files
@@ -122,15 +134,15 @@ if(len(images_jpg) > 0 or len(images_raw) > 0):
     # If there are  JPGs copy/move them directly into the RAW subfolder
     if(len(images_jpg) > 0):
         for raw_image in images_raw:
-            process_func(raw_image, os.path.join(output_dir, cfg.export_folder, 'RAW'))
+            process_func(raw_image, os.path.join(output_path, cfg.export_folder, 'RAW'))
     # Else copy/move them directly into the export folder
     else:
         for raw_image in images_raw:
-            process_func(raw_image, os.path.join(output_dir, cfg.export_folder))
+            process_func(raw_image, os.path.join(output_path, cfg.export_folder))
 
     # JPG
     for jpg_image in images_jpg:
-        process_func(jpg_image, os.path.join(output_dir, cfg.export_folder, 'JPG'))
+        process_func(jpg_image, os.path.join(output_path, cfg.export_folder, 'JPG'))
 
 # no images found
 else:
