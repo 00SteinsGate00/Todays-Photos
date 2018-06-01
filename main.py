@@ -18,10 +18,6 @@ arguments = parser.parse_args()
 
 # Argument Verification
 
-# Destination Dir
-if(not os.path.exists(arguments.destination)):
-    print('Can\'t find destination directory "%s"' % arguments.destination)
-    sys.exit()
 # Time
 time = time_util.parseTimeArgument(arguments.time)
 if(time == None):
@@ -70,3 +66,20 @@ images_raw = [os.path.join(cfg.source_dir, image)
                 # not jpeg => RAW
                 and os.path.splitext(image)[1] not in ['.JPG', '.jpg', '.JPEG', '.jpeg']
              ]
+
+# export images
+if(len(images_jpg) > 0 or len(images_raw) > 0):
+    # create the target directory
+    os.makedirs(arguments.destination, exist_ok=True)
+    # create all the output subfolders
+    for target_folder in cfg.target_folders:
+        os.makedirs(os.path.join(arguments.destination, target_folder), exist_ok=True)
+    # create the export folder in case it was none of target folders
+    os.makedirs(os.path.join(arguments.destination, cfg.export_folder), exist_ok=True)
+    # check if there are JPGs and create the folders accordingly
+    if(len(images_jpg) > 0):
+        os.makedirs(os.path.join(arguments.destination, cfg.export_folder, 'JPG'))
+        os.makedirs(os.path.join(arguments.destination, cfg.export_folder, 'RAW'))
+# no images found
+else:
+    print('No images from %s' % (datetime.date.isoformat(time)))
