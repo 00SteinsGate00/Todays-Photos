@@ -83,6 +83,9 @@ if(not os.path.exists(output_dir)):
     sys.exit()
 
 
+# determine the full output path
+output_dir_name = cfg.delimiter.join(filter(None, [date.strftime(cfg.date_format), type, arguments.name]))
+output_path     = os.path.join(output_dir, output_dir_name)
 
 # ########## #
 # Processing #
@@ -114,8 +117,6 @@ images_raw = [os.path.join(cfg.source_dir, image)
 # export images
 if(len(images_jpg) > 0 or len(images_raw) > 0):
     # create the target directory
-    output_dir_name = cfg.delimiter.join(filter(None, [date.strftime(cfg.date_format), type, arguments.name]))
-    output_path     = os.path.join(output_dir, output_dir_name)
     os.makedirs(output_path, exist_ok=True)
     # create all the output subfolders
     for target_folder in cfg.target_folders:
@@ -129,21 +130,48 @@ if(len(images_jpg) > 0 or len(images_raw) > 0):
 
     # copy/move the images
     # store the correct function to move or copy the files
-    process_func = shutil.move if arguments.delete_orig else shutil.copy2
+    process_func    = shutil.move if arguments.delete_orig else shutil.copy2
+    process_verbose = "Moving" if arguments.delete_orig else "Copying"
     # RAW
     # If there are  JPGs copy/move them directly into the RAW subfolder
+    print("%s RAW images" % process_verbose)
+    print("")
     if(len(images_jpg) > 0):
-        for raw_image in images_raw:
+        for index, raw_image in enumerate(images_raw, start=1):
+            print("%s %s... (%d/%d)" % (process_verbose, os.path.basename(raw_image), index, len(images_raw)))
             process_func(raw_image, os.path.join(output_path, cfg.export_folder, 'RAW'))
     # Else copy/move them directly into the export folder
     else:
-        for raw_image in images_raw:
+        for index, raw_image in enumerate(images_raw, start=1):
+            print("%s %s... (%d/%d)" % (process_verbose, os.path.basename(raw_image), index, len(images_raw)))
             process_func(raw_image, os.path.join(output_path, cfg.export_folder))
+    print("")
 
     # JPG
-    for jpg_image in images_jpg:
+    print("%s JPG images" % process_verbose)
+    print("")
+    for index, jpg_image in enumerate(images_jpg, start=1):
+        print("%s %s... (%d/%d)" % (process_verbose, os.path.basename(jpg_image), index, len(images_jpg)))
         process_func(jpg_image, os.path.join(output_path, cfg.export_folder, 'JPG'))
 
 # no images found
 else:
     print('No images from %s' % (date.strftime(cfg.date_format)))
+
+
+
+# ############ #
+# State Output #
+# ############ #
+
+print("")
+print('Date: %s' % date.strftime(cfg.date_format))
+print('Type: %s' % (type if type else "None"))
+print('Name: %s' % (name if name else "None"))
+print('Source Directory: %s' % cfg.source_dir)
+print('Output Directory: %s' % output_path)
+print('Delete Originals: %s' % ("Yes" if arguments.delete_orig else "No"))
+print("")
+print('RAW images: %d' % len(images_raw))
+print('JPG images: %d' % len(images_jpg))
+print("")
