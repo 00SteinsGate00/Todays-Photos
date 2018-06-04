@@ -52,11 +52,12 @@ Modify the configuration file to your needs
 
 | Option               | Value                            | Description                                                                                   |
 |----------------------|----------------------------------|-----------------------------------------------------------------------------------------------|
-| `-d`, `--date`       | `today` `yesterday` `YYYY-MM-DD` | Date for the photos to backup. Defaults to *today*                                            |
+| `-d`, `--date`       | `today`, `yesterday`, `YYYY-MM-DD` | Date for the photos to backup. Defaults to *today*                                            |
 | `-n`, `--name`       | String                           | Name of the photoshoot for the output folder                                                  |
 | `-t`, `--type`       | String                           | Type of the photoshoot for the output folder. For example *Travel*, *Landscape* or *Portrait* |
-| `-r`, `--remove-orig` | None                             | If set the original images will be deleted                                                    |
+| `-r`, `--remove-org` | None                             | If set the original images will be deleted                                                    |
 | `-o`, `--output`     | Directory                        | Output directory that overwrites the one set in the **config.json**                           |
+| `-s`, `--source`     | Directory                        | Source directory that overwrites the one set in the **config.json**                           |
 
 
 ## Folder Structure

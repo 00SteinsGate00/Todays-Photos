@@ -34,6 +34,8 @@ parser.add_argument('-r', '--remove-orig',
                     action='store_true')
 parser.add_argument('-o','--output',
                     help='Output directory that will overwrite the one from the configuration file')
+parser.add_argument('-s', '--source',
+                    help='Source directory that will overwrite the one from the configuration file')
 arguments = parser.parse_args()
 
 
@@ -83,6 +85,12 @@ if(not os.path.exists(output_dir)):
     print('Output directory "%s" does not exist' % output_dir)
     sys.exit()
 
+# source directory
+# command line specified one will overwrite the one from the config file
+source_dir = arguments.source if arguments.source else cfg.source_dir
+if(not os.path.exists(source_dir)):
+    print('Source directory "%s" does not exist' % source_dir)
+    sys.exit()
 
 # determine the full output path
 output_dir_name = cfg.delimiter.join(filter(None, [date.strftime(cfg.date_format), type, arguments.name]))
@@ -93,10 +101,10 @@ output_path     = os.path.join(output_dir, output_dir_name)
 # ########## #
 
 # jpeg images
-images_jpg = [os.path.join(cfg.source_dir, image)
+images_jpg = [os.path.join(source_dir, image)
                 for image
-                in os.listdir(cfg.source_dir)
-                if time_util.modTimestamp(os.path.join(cfg.source_dir, image)) == date
+                in os.listdir(source_dir)
+                if time_util.modTimestamp(os.path.join(source_dir, image)) == date
                 # some hidden temporary files
                 and image[0] != '.'
                 # jpeg extensions
@@ -104,10 +112,10 @@ images_jpg = [os.path.join(cfg.source_dir, image)
              ]
 
 # RAW images
-images_raw = [os.path.join(cfg.source_dir, image)
+images_raw = [os.path.join(source_dir, image)
                 for image
-                in os.listdir(cfg.source_dir)
-                if time_util.modTimestamp(os.path.join(cfg.source_dir, image)) == date
+                in os.listdir(source_dir)
+                if time_util.modTimestamp(os.path.join(source_dir, image)) == date
                 # some hidden temporary files
                 and image[0] != '.'
                 # not jpeg => RAW
@@ -169,7 +177,7 @@ print("")
 print('Date: %s' % date.strftime(cfg.date_format))
 print('Type: %s' % (type if type else "None"))
 print('Name: %s' % (name if name else "None"))
-print('Source Directory: %s' % cfg.source_dir)
+print('Source Directory: %s' % source_dir)
 print('Output Directory: %s' % output_path)
 print('Delete Originals: %s' % ("Yes" if arguments.remove_orig else "No"))
 print("")
