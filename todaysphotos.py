@@ -53,11 +53,11 @@ except json.JSONDecodeError as e:
     sys.exit()
 # file does not exist
 except FileNotFoundError as e:
-    print('Configuration file "%s" not found' % (config_file))
+    print('Configuration file "{config_file}" not found'.format(config_file=config_file))
     sys.exit()
 # missing config option
 except KeyError as e:
-    print('%s missing in configuration file "%s"' % (e, config_file))
+    print('{key} missing in configuration file "{config_file}"'.format(key=e, config_file=config_file))
     sys.exit()
 
 
@@ -69,7 +69,7 @@ except KeyError as e:
 # Time
 date = time_util.parseTimeArgument(arguments.date)
 if(date == None):
-    print('Can\'t parse "%s" as a time argument' % arguments.date)
+    print('Can\'t parse "{date}" as a time argument'.format(date=arguments.date))
     print('Must be one of "today" or "yesterday" or of the format "YYYY-MM-DD"')
     sys.exit()
 
@@ -82,14 +82,14 @@ name = arguments.name if arguments.name else ""
 # command line specified one will overwrite the one from the config file
 output_dir = arguments.output if arguments.output else cfg.destination_dir
 if(not os.path.exists(output_dir)):
-    print('Output directory "%s" does not exist' % output_dir)
+    print('Output directory "{output_dir}" does not exist'.format(output_dir=output_dir))
     sys.exit()
 
 # source directory
 # command line specified one will overwrite the one from the config file
 source_dir = arguments.source if arguments.source else cfg.source_dir
 if(not os.path.exists(source_dir)):
-    print('Source directory "%s" does not exist' % source_dir)
+    print('Source directory "{source_dir}" does not exist'.format(source_dir=source_dir))
     sys.exit()
 
 # determine the full output path
@@ -143,7 +143,7 @@ if(len(images_jpg) > 0 or len(images_raw) > 0):
     process_verbose = "Moving" if arguments.remove_orig else "Copying"
     # RAW
     # If there are  JPGs copy/move them directly into the RAW subfolder
-    print("%s RAW images" % process_verbose)
+    print("{verbose} RAW images".format(verbose=process_verbose))
     print("")
     if(len(images_jpg) > 0):
         for index, raw_image in enumerate(images_raw, start=1):
@@ -152,20 +152,20 @@ if(len(images_jpg) > 0 or len(images_raw) > 0):
     # Else copy/move them directly into the export folder
     else:
         for index, raw_image in enumerate(images_raw, start=1):
-            print("%s %s... (%d/%d)" % (process_verbose, os.path.basename(raw_image), index, len(images_raw)))
+            print("{verbose} {image}... ({index}/{total_images})".format(verbose=process_verbose, image=os.path.basename(raw_image), index=index, total_images=len(images_raw)))
             process_func(raw_image, os.path.join(output_path, cfg.export_folder))
     print("")
 
     # JPG
-    print("%s JPG images" % process_verbose)
+    print("{verbose} JPG images".format(verbose=process_verbose))
     print("")
     for index, jpg_image in enumerate(images_jpg, start=1):
-        print("%s %s... (%d/%d)" % (process_verbose, os.path.basename(jpg_image), index, len(images_jpg)))
+        print("{verbose} {image}... ({index}/{total_images})".format(verbose=process_verbose, image=os.path.basename(raw_image), index=index, total_images=len(images_jpg)))
         process_func(jpg_image, os.path.join(output_path, cfg.export_folder, 'JPG'))
 
 # no images found
 else:
-    print('No images from %s' % (date.strftime(cfg.date_format)))
+    print('No images from {date}'.format(date=date.strftime(cfg.date_format)))
 
 
 
@@ -174,13 +174,13 @@ else:
 # ############ #
 
 print("")
-print('Date: %s' % date.strftime(cfg.date_format))
-print('Type: %s' % (type if type else "None"))
-print('Name: %s' % (name if name else "None"))
-print('Source Directory: %s' % source_dir)
-print('Output Directory: %s' % output_path)
-print('Delete Originals: %s' % ("Yes" if arguments.remove_orig else "No"))
+print('Date: {date}'.format(date=date.strftime(cfg.date_format)))
+print('Type: {type}'.format(type=(type if type else "None")))
+print('Name: {name}'.format(name=(name if name else "None")))
+print('Source Directory: {source_dir}'.format(source_dir=source_dir))
+print('Output Directory: {output_path}'.format(output_path=output_path))
+print('Delete Originals: {delete_state}'.format(delete_state=("Yes" if arguments.remove_orig else "No")))
 print("")
-print('RAW images: %d' % len(images_raw))
-print('JPG images: %d' % len(images_jpg))
+print('RAW images: {total_raw_images}'.format(total_raw_images=len(images_raw)))
+print('JPG images: {total_jpg_images}'.format(total_jpg_images=len(images_jpg)))
 print("")
